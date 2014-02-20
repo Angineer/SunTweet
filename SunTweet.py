@@ -1,6 +1,7 @@
 # SunTweet
 # This script will tweet about the sun
 
+import time
 import twitter
 import Sun
 from authorize import authorize
@@ -14,15 +15,18 @@ except:
 solarDataPoint=datum("/home/andy/solarOutput.txt")
 
 #Update the data point every 15 minutes
-currTime=time
-if (currTime>time+15):
-	solarDataPoint.Update()
-	solarValue=solarDataPoint.GetValue()
+lastTime=time.clock()
+while True:
+	currTime=time.clock() #Check current time
+	if (currTime>lastTime+15*60):
+		solarDataPoint.Update()
+		solarValue=solarDataPoint.GetValue()
 
-	#Based on the value of the data point, tweet about it
-	if (solarValue>0):
-		api.PostUpdate("The sun is currently shining at "+solarValue+" watts")
+		#Based on the value of the data point, tweet about it
+		if (solarValue>0):
+			api.PostUpdate("The sun is currently shining at "+solarValue+" watts")
 
-	currTime=time
+		currTime=time
+	time.sleep(60) #Wait 1 minute before trying again
 
 api.ClearCredentials()
