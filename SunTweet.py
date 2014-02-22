@@ -3,30 +3,34 @@
 
 import time
 import twitter
-import Sun
+from Sun import *
 from authorize import authorize
 
 #Start up a twitter API
-try:
-	api=authorize()
-except:
+api=authorize()
 
 #Create a new data point to monitor
-solarDataPoint=datum("/home/andy/solarOutput.txt")
+solarDataPoint=datum("/home/andy/Dropbox/Projects/Python/SunTweet/test.txt")
 
 #Update the data point every 15 minutes
-lastTime=time.clock()
+lastTime=time.time()
+lastSolarTime=solarDataPoint.GetDateTime()
 while True:
-	currTime=time.clock() #Check current time
-	if (currTime>lastTime+15*60):
+	currTime=time.time() #Check current time
+	if (currTime>=lastTime+15*60):
 		solarDataPoint.Update()
+		solarTime=solarDataPoint.GetDateTime()
 		solarValue=solarDataPoint.GetValue()
 
-		#Based on the value of the data point, tweet about it
-		if (solarValue>0):
-			api.PostUpdate("The sun is currently shining at "+solarValue+" watts")
+		if (solarTime!=lastSolarTime): #Make sure log is being updated
+			if (solarValue>10): #Based on the value of the data point, tweet about it
+				api.PostUpdate("The sun is currently shining at "+solarValue+" watts")
 
-		currTime=time
+			lastSolarTime=solarTime
+		else:
+			print "Log dupe"
+
+		lastTime=currTime
 	time.sleep(60) #Wait 1 minute before trying again
 
-api.ClearCredentials()
+#api.ClearCredentials()
