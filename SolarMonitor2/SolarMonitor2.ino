@@ -35,14 +35,18 @@ int cardPin = 4;
 int voltagePin = 0; //Pin measuring panel voltage
 int voltage; //Voltage reading
 
-// Loop variable
-int counter = 0;
+// Loop variables
+int time = 0;
+int lastTime = 0;
 
 void setup(){
   Serial.begin(9600);
   
   while (!Serial){ //Leonardo thing
   }
+  
+  // Set time
+  setTime(9, 43, 00, 22, 2, 2014);
   
   // Setup pins
   pinMode(voltagePin, INPUT);
@@ -64,10 +68,10 @@ void loop(){
   //Listen for incoming clients
   listenForClient();
   
-  counter+=1;
+  time=minute();
   
   //Every so often, update the data
-  if (counter > 30000) {
+  if (time != lastTime) {
     
     //Read voltages
     readVoltage();
@@ -77,7 +81,7 @@ void loop(){
     //Print to file
     printToFile("solar.txt", voltage);
     
-    counter=0;
+    lastTime=time;
   }
 }
 
@@ -236,14 +240,18 @@ void printToFile(const char* file, int voltage) {
   
   // if the file opened okay, write to it:
   if (myFile) {
+    if (d<10) myFile.print("0");
     myFile.print(d);
     myFile.print("/");
-    myFile.print(m);
+    if (mo<10) myFile.print ("0");
+    myFile.print(mo);
     myFile.print("/");
     myFile.print(y);
     myFile.print(" ");
+    if (h<10) myFile.print("0");
     myFile.print(h);
     myFile.print(":");
+    if (m<10) myFile.print("0");
     myFile.print(m);
     myFile.print(" ");
     myFile.println(voltage);
