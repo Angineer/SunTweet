@@ -19,9 +19,8 @@ byte mac[] = { 0x90, 0xA2, 0xDA, 0x0D, 0x0D, 0x67 };
 IPAddress ip(192, 168, 0, 80);
 IPAddress gateway(192, 168, 0, 1);
 IPAddress subnet(255, 255, 0, 0);
-
 EthernetServer server(80); // (port 80 is default for HTTP)
-#define BUFSIZ 100
+#define bufferSize 100
 
 // SD card info
 Sd2Card card;
@@ -29,11 +28,13 @@ SdVolume volume;
 SdFile root;
 SdFile file;
 File myFile;
-int cardPin = 4;
+String strFilename;
+char charFilename[18];
+#define cardPin = 4;
 
 // Solar panel info
-int voltagePin = 0; //Pin measuring panel voltage
 int voltage; //Voltage reading
+#define voltagePin = 0; //Pin measuring panel voltage
 
 // Loop variables
 int time = 0;
@@ -68,25 +69,32 @@ void loop(){
   //Listen for incoming clients
   listenForClient();
   
-  time=minute();
-  
   //Every so often, update the data
+  time=minute();
+
   if (time != lastTime) {
-    
     //Read voltages
-    readVoltage();
+    voltage=analogRead(voltagePin);
   
     Serial.println(voltage);
   
     //Print to file
-    printToFile("solar.txt", voltage);
+    strFilename = "solar_"
+    strFilename += str(year()) 
+    if (month() < 10) strFilename += "0"
+    strFilename += str(month())
+    if (day() < 10) strFilename += "0"
+    strFilename += str(day())
+    strFilename += ".txt" 
+    strFilename.toCharArray(charFilename, sizeof(charFilename));
+    printToFile(charFilename, voltage);
     
     lastTime=time;
   }
 }
 
 void listenForClient() {
-  char clientline[BUFSIZ];
+  char clientline[bufferSize];
   int index = 0;
   
   // listen for incoming clients
@@ -103,8 +111,8 @@ void listenForClient() {
           clientline[index] = c;
           index++;
           // are we too big for the buffer? start tossing out data
-          if (index >= BUFSIZ) 
-            index = BUFSIZ -1;
+          if (index >= bufferSize) 
+            index = bufferSize -1;
  
           // continue to read more data!
           continue;
@@ -224,10 +232,6 @@ void ListFiles(EthernetClient client, uint8_t flags) {
     client.println("</li>");
   }
   client.println("</ul>");
-}
-
-void readVoltage() {
-  voltage=analogRead(voltagePin);
 }
 
 void printToFile(const char* file, int voltage) {
