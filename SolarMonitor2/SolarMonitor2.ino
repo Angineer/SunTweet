@@ -30,11 +30,11 @@ SdFile file;
 File myFile;
 String strFilename;
 char charFilename[18];
-#define cardPin = 4;
+#define cardPin 4
 
 // Solar panel info
 int voltage; //Voltage reading
-#define voltagePin = 0; //Pin measuring panel voltage
+#define voltagePin 0 //Pin measuring panel voltage
 
 // Loop variables
 int time = 0;
@@ -79,13 +79,13 @@ void loop(){
     Serial.println(voltage);
   
     //Print to file
-    strFilename = "solar_"
-    strFilename += str(year()) 
-    if (month() < 10) strFilename += "0"
-    strFilename += str(month())
-    if (day() < 10) strFilename += "0"
-    strFilename += str(day())
-    strFilename += ".txt" 
+    strFilename = "solar_";
+    strFilename += year();
+    if (month() < 10) strFilename += "0";
+    strFilename += month();
+    if (day() < 10) strFilename += "0";
+    strFilename += day();
+    strFilename += ".txt";
     strFilename.toCharArray(charFilename, sizeof(charFilename));
     printToFile(charFilename, voltage);
     
